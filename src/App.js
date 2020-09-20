@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useField } from './hooks';
 
 import {
   Switch,
@@ -30,9 +31,13 @@ const Menu = () => {
 const Anecdote = ({ anecdote }) => {
   return (
     <div>
-      <h3>{anecdote.content}</h3>
+      <h3>
+        {anecdote.content} by {anecdote.author}
+      </h3>
       <p>Has {anecdote.votes} votes</p>
-      <p>For more info see {anecdote.info} votes</p>
+      <p>
+        For more info see: <Link to={anecdote.info}>{anecdote.info}</Link>
+      </p>
     </div>
   );
 };
@@ -86,50 +91,47 @@ const Footer = () => (
   </div>
 );
 
+const Button = (props) => {
+  const { clear, ...rest } = props;
+  return <button onClick={clear}>reset</button>;
+};
+
+const Input = (props) => {
+  const { clear, ...rest } = props;
+  return <input {...rest} />;
+};
+
 const CreateNew = (props) => {
-  const [content, setContent] = useState('');
-  const [author, setAuthor] = useState('');
-  const [info, setInfo] = useState('');
+  const content = useField('text');
+  const author = useField('text');
+  const info = useField('text');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0,
     });
   };
 
   return (
     <div>
-      <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+      <h2>Create a new anecdote</h2>
+      <form>
         <div>
-          content
-          <input
-            name="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
+          Content: <Input autoFocus {...content} />
         </div>
         <div>
-          author
-          <input
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-          />
+          Author: <Input {...author} />
         </div>
         <div>
-          url for more info
-          <input
-            name="info"
-            value={info}
-            onChange={(e) => setInfo(e.target.value)}
-          />
+          Url for more info: <Input {...info} />
         </div>
-        <button>create</button>
+        <br></br>
+        <button onClick={handleSubmit}>create</button>
+        <Button />
       </form>
     </div>
   );
@@ -137,6 +139,7 @@ const CreateNew = (props) => {
 
 const App = () => {
   const history = useHistory();
+
   const [anecdotes, setAnecdotes] = useState([
     {
       content: 'If it hurts, do it more often',
@@ -206,6 +209,7 @@ const App = () => {
           <AnecdoteList anecdotes={anecdotes} />
         </Route>
       </Switch>
+      <br></br>
       <div>
         <Footer />
       </div>
